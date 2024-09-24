@@ -49,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 60),
+                const SizedBox(height: 20),
                 const Text(
                   'Make noise to jump.',
                   style: TextStyle(fontSize: 25),
@@ -80,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 60),
+                const SizedBox(height: 20),
                 const Text(
                   'Test microphone.',
                   style: TextStyle(fontSize: 24),
