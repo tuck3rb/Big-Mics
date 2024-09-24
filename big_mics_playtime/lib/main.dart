@@ -30,6 +30,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int currentPageIndex = 0;
 
+  void _testMicrophone() { // Will need to update
+    print('Microphone Testing button pressed.');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,10 +68,34 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         // Mic Test page
-        const Center(
-          child: Text(
-            'Test microphone.',
-            style: TextStyle(fontSize: 24),
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 60),
+              const Text(
+                'Test microphone.',
+                style: TextStyle(fontSize: 24),
+              ),
+              const SizedBox(height: 30), // Functions as a spacer
+              Container( 
+                width: 75,
+                height: 400,
+                child: Placeholder(), // Mic test bar
+              ),
+              const SizedBox(height: 30), // Functions as a spacer
+              RawMaterialButton(
+                onPressed: _testMicrophone,
+                elevation: 2.0,
+                fillColor: Colors.white,
+                child: Icon(
+                  Icons.mic,
+                  size: 35.0,
+                ),
+                padding: const EdgeInsets.all(15.0),
+                shape: const CircleBorder(),
+              ),
+            ],
           ),
         ),
     ][currentPageIndex],
