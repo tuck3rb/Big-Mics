@@ -44,63 +44,67 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: <Widget>[
         // Play page
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 60),
-              const Text(
-                'Make noise to jump.',
-                style: TextStyle(fontSize: 25),
-              ),
-              const SizedBox(height: 30), // Functions as a spacer
-              Container( 
-                width: 350,
-                height: 350,
-                child: Placeholder(), // Future implementation of game
-              ),
-              const SizedBox(height: 30), // Functions as a spacer
-              const Text(
-                'Score: ', // Will need to update this to be non const and add in score variable
-                style: TextStyle(fontSize: 25),
-              ),
-              const SizedBox(height: 30), // Functions as a spacer
-              const Text(
-                'High Score: ', // Will need to update this to be non const and add in high_score variable
-                style: TextStyle(fontSize: 25),
-              ),
-            ],
+        SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 60),
+                const Text(
+                  'Make noise to jump.',
+                  style: TextStyle(fontSize: 25),
+                ),
+                const SizedBox(height: 30), // Functions as a spacer
+                Container( 
+                  width: 350,
+                  height: 350,
+                  child: Placeholder(), // Future implementation of game
+                ),
+                const SizedBox(height: 30), // Functions as a spacer
+                const Text(
+                  'Score: ', // Will need to update this to be non const and add in score variable
+                  style: TextStyle(fontSize: 25),
+                ),
+                const SizedBox(height: 30), // Functions as a spacer
+                const Text(
+                  'High Score: ', // Will need to update this to be non const and add in high_score variable
+                  style: TextStyle(fontSize: 25),
+                ),
+              ],
+            ),
           ),
         ),
         // Mic Test page
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 60),
-              const Text(
-                'Test microphone.',
-                style: TextStyle(fontSize: 24),
-              ),
-              const SizedBox(height: 30), // Functions as a spacer
-              Container( 
-                width: 75,
-                height: 400,
-                child: Placeholder(), // Mic test bar
-              ),
-              const SizedBox(height: 30), // Functions as a spacer
-              RawMaterialButton(
-                onPressed: _testMicrophone,
-                elevation: 2.0,
-                fillColor: Colors.white,
-                child: Icon(
-                  Icons.mic,
-                  size: 35.0,
+        SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 60),
+                const Text(
+                  'Test microphone.',
+                  style: TextStyle(fontSize: 24),
                 ),
-                padding: const EdgeInsets.all(15.0),
-                shape: const CircleBorder(),
-              ),
-            ],
+                const SizedBox(height: 30), // Functions as a spacer
+                Container( 
+                  width: 75,
+                  height: 400,
+                  child: Placeholder(), // Mic test bar
+                ),
+                const SizedBox(height: 30), // Functions as a spacer
+                RawMaterialButton(
+                  onPressed: _testMicrophone,
+                  elevation: 2.0,
+                  fillColor: Colors.white,
+                  child: Icon(
+                    Icons.mic,
+                    size: 35.0,
+                  ),
+                  padding: const EdgeInsets.all(15.0),
+                  shape: const CircleBorder(),
+                ),
+              ],
+            ),
           ),
         ),
     ][currentPageIndex],
