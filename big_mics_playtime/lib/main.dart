@@ -99,22 +99,27 @@ void initState() {
                   'Make noise to jump.',
                   style: TextStyle(fontSize: 25),
                 ),
-                const SizedBox(height: 30), // Functions as a spacer
+                const SizedBox(height: 20), // Functions as a spacer
                 Container( 
                   width: 350,
                   height: 350,
                   child: Placeholder(), // Future implementation of game
                 ),
-                const SizedBox(height: 30), // Functions as a spacer
-                const Text(
-                  'Score: ', // Will need to update this to be non const and add in score variable
-                  style: TextStyle(fontSize: 25),
+                const SizedBox(height: 20), // Functions as a spacer
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Score: ', // Will need to update this to be non const and add in score variable
+                      style: TextStyle(fontSize: 15),
+                    ),
+                    const SizedBox(width: 50),
+                    const Text(
+                      'High Score: ', // Will need to update this to be non const and add in high_score variable
+                      style: TextStyle(fontSize: 15),)
+                  ]
                 ),
-                const SizedBox(height: 30), // Functions as a spacer
-                const Text(
-                  'High Score: ', // Will need to update this to be non const and add in high_score variable
-                  style: TextStyle(fontSize: 25),
-                ),
+                const SizedBox(height: 20), // Functions as a spacer
               ],
             ),
           ),
