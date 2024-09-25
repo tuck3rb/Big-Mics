@@ -1,5 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:noise_meter/noise_meter.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized(); // Forces portrait mode
@@ -33,11 +37,52 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  NoiseReading? _latestReading;
+  StreamSubscription<NoiseReading>? _noiseSubscription;
   int currentPageIndex = 0;
+  NoiseMeter noiseMeter = NoiseMeter();
+  double maxVol = 0.0;
+  double minVol = 30.0;
+  bool recording = true;
 
-  void _testMicrophone() { // Will need to update
-    print('Microphone Testing button pressed.');
+
+@override
+void initState() {
+  super.initState();
+  requestPermission();
+  noiseMeter = NoiseMeter();
   }
+  
+  Future<bool> checkPermission() async {
+    return await Permission.microphone.isGranted;
+  }
+
+  Future<PermissionStatus> requestPermission() async {
+    PermissionStatus permissionStatus = await Permission.microphone.request();
+    return permissionStatus;
+  }
+
+  Future<void> start() async {
+    _latestReading = null;
+    maxVol = 0;
+    _noiseSubscription = noiseMeter.noise.listen(onData);
+    print(_noiseSubscription);
+    setState(() => recording = true);
+  }
+
+  void stop() {
+    _noiseSubscription?.cancel();
+    setState(() => recording = false);
+  }
+
+  void onData(NoiseReading noiseReading) => setState(() {
+    _latestReading = noiseReading;
+    if (_latestReading != null) {
+      if (_latestReading!.meanDecibel > maxVol) {
+        maxVol = _latestReading!.meanDecibel;
+      }
+    }
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -81,9 +126,13 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 20),
-                const Text(
-                  'Test microphone.',
-                  style: TextStyle(fontSize: 24),
+                Text(
+                  _latestReading != null
+                    ? _latestReading!.meanDecibel
+                      .toString()
+                      .substring(0, 2)
+                    : '0',
+                  style: const TextStyle(fontSize: 24),
                 ),
                 const SizedBox(height: 30), // Functions as a spacer
                 Container( 
@@ -93,15 +142,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 const SizedBox(height: 30), // Functions as a spacer
                 RawMaterialButton(
-                  onPressed: _testMicrophone,
+                  onPressed: recording ? stop : start,
                   elevation: 2.0,
                   fillColor: Colors.white,
-                  child: Icon(
+                  padding: const EdgeInsets.all(15.0),
+                  shape: const CircleBorder(),
+                  child: const Icon(
                     Icons.mic,
                     size: 35.0,
                   ),
-                  padding: const EdgeInsets.all(15.0),
-                  shape: const CircleBorder(),
                 ),
               ],
             ),
