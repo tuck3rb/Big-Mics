@@ -132,39 +132,44 @@ void initState() {
                   style: const TextStyle(fontSize: 24),
                 ),
                 const SizedBox(height: 30), // Functions as a spacer
-                Container(
-                  width: 75,
-                  height:300,
-                  decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-                  // alignment: Alignment.bottomCenter,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        bottom: 60 *3,
-                        left: 0,
-                        right: 0,
-                        child: Row(
-                          children: [
-                            // const Text('60 dB', style: TextStyle(fontSize: 10)),
-                            Expanded(child: Container(height: 2, color: Colors.red),),
-                            // const Text('Min.', style: TextStyle(fontSize: 10),),
-                          ],
-                        ),
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: 75,
+                      height:300,
+                      decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+                      alignment: Alignment.bottomCenter,
+                      child: Container( 
+                        width: 75,
+                        height: mic.getLatestReading() != null
+                          ? mic.getLatestReading()!.meanDecibel * 3
+                      
+                          : 20,
+                        color: mic.getLatestReading() != null
+                          ? (mic.getLatestReading()!.meanDecibel >= 60 ? Colors.green : Colors.red)
+                          : Colors.grey,
+                        // Mic test bar
                       ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Container( 
-                          width: 75,
-                          height: mic.getLatestReading() != null
-                            ? mic.getLatestReading()!.meanDecibel * 3
-                        
-                            : 20,
-                            color: Colors.green,
-                          // Mic test bar
-                        ),
+                    ),
+                    Positioned(
+                      bottom: 60 * 3,
+                      left: -70,
+                      right: -70,
+                      child: Row(
+                        children: [
+                          const Text('60 dB  ', style: TextStyle(fontSize: 15)),
+                          Expanded(
+                            child: Container(
+                              height: 2,
+                              color: Colors.black,
+                            ),
+                          ),
+                          const Text('  Min. ', style: TextStyle(fontSize: 15)),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 30), // Functions as a spacer
                 RawMaterialButton(
