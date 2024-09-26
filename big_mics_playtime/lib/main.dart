@@ -135,15 +135,35 @@ void initState() {
                 Container(
                   width: 75,
                   height:300,
-                  alignment: Alignment.bottomCenter,
-                  child: Container( 
-                    width: 75,
-                    height: mic.getLatestReading() != null
-                      ? mic.getLatestReading()!.meanDecibel * 4
-                  
-                      : 20,
-                      color: Colors.green,
-                     // Mic test bar
+                  decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+                  // alignment: Alignment.bottomCenter,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        bottom: 60 *3,
+                        left: 0,
+                        right: 0,
+                        child: Row(
+                          children: [
+                            // const Text('60 dB', style: TextStyle(fontSize: 10)),
+                            Expanded(child: Container(height: 2, color: Colors.red),),
+                            // const Text('Min.', style: TextStyle(fontSize: 10),),
+                          ],
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Container( 
+                          width: 75,
+                          height: mic.getLatestReading() != null
+                            ? mic.getLatestReading()!.meanDecibel * 3
+                        
+                            : 20,
+                            color: Colors.green,
+                          // Mic test bar
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 30), // Functions as a spacer
