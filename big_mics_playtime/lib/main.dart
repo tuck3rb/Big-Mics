@@ -132,14 +132,19 @@ void initState() {
                   style: const TextStyle(fontSize: 24),
                 ),
                 const SizedBox(height: 30), // Functions as a spacer
-                Container( 
+                Container(
                   width: 75,
-                  height: mic.getLatestReading() != null
-                    ? mic.getLatestReading()!.meanDecibel * 4
-
-                    : 20,
-                    color: Colors.green,
-                   // Mic test bar
+                  height:300,
+                  alignment: Alignment.bottomCenter,
+                  child: Container( 
+                    width: 75,
+                    height: mic.getLatestReading() != null
+                      ? mic.getLatestReading()!.meanDecibel * 4
+                  
+                      : 20,
+                      color: Colors.green,
+                     // Mic test bar
+                  ),
                 ),
                 const SizedBox(height: 30), // Functions as a spacer
                 RawMaterialButton(
