@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:noise_meter/noise_meter.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:big_mics_playtime/objects/mic.dart';
 
 
 
@@ -38,20 +39,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  NoiseReading? _latestReading;
-  StreamSubscription<NoiseReading>? _noiseSubscription;
   int currentPageIndex = 0;
-  NoiseMeter noiseMeter = NoiseMeter();
-  double maxVol = 0.0;
-  double minVol = 30.0;
-  bool recording = true;
-
+  Mic mic = Mic();
+  late Timer timer;
 
 @override
 void initState() {
   super.initState();
   requestPermission();
-  noiseMeter = NoiseMeter();
   }
   
   Future<bool> checkPermission() async {
@@ -63,27 +58,23 @@ void initState() {
     return permissionStatus;
   }
 
-  Future<void> start() async {
-    _latestReading = null;
-    maxVol = 0;
-    _noiseSubscription = noiseMeter.noise.listen(onData);
-    print(_noiseSubscription);
-    setState(() => recording = true);
+
+
+  void micStart() async{
+    mic.start();
+    timer = Timer.periodic(const Duration(milliseconds: 50), (_) {
+      setState(() => mic.recording = true);
+    });
+  }
+  void micStop() {
+    mic.stop();
+    cancelTimer();
+    setState(() => mic.recording = false);
   }
 
-  void stop() {
-    _noiseSubscription?.cancel();
-    setState(() => recording = false);
+  void cancelTimer() {
+    timer.cancel();
   }
-
-  void onData(NoiseReading noiseReading) => setState(() {
-    _latestReading = noiseReading;
-    if (_latestReading != null) {
-      if (_latestReading!.meanDecibel > maxVol) {
-        maxVol = _latestReading!.meanDecibel;
-      }
-    }
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -133,22 +124,56 @@ void initState() {
               children: [
                 const SizedBox(height: 20),
                 Text(
-                  _latestReading != null
-                    ? _latestReading!.meanDecibel
+                  mic.getLatestReading()!= null
+                    ? mic.getLatestReading()!.meanDecibel
                       .toString()
                       .substring(0, 2)
                     : '0',
                   style: const TextStyle(fontSize: 24),
                 ),
                 const SizedBox(height: 30), // Functions as a spacer
-                Container( 
-                  width: 75,
-                  height: 400,
-                  child: Placeholder(), // Mic test bar
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: 75,
+                      height:300,
+                      decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+                      alignment: Alignment.bottomCenter,
+                      child: Container( 
+                        width: 75,
+                        height: mic.getLatestReading() != null
+                          ? mic.getLatestReading()!.meanDecibel * 3
+                      
+                          : 20,
+                        color: mic.getLatestReading() != null
+                          ? (mic.getLatestReading()!.meanDecibel >= 60 ? Colors.green : Colors.red)
+                          : Colors.grey,
+                        // Mic test bar
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 60 * 3,
+                      left: -70,
+                      right: -70,
+                      child: Row(
+                        children: [
+                          const Text('60 dB  ', style: TextStyle(fontSize: 15)),
+                          Expanded(
+                            child: Container(
+                              height: 2,
+                              color: Colors.black,
+                            ),
+                          ),
+                          const Text('  Min. ', style: TextStyle(fontSize: 15)),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 30), // Functions as a spacer
                 RawMaterialButton(
-                  onPressed: recording ? stop : start,
+                  onPressed: mic.recording ? micStop : micStart,
                   elevation: 2.0,
                   fillColor: Colors.white,
                   padding: const EdgeInsets.all(15.0),
