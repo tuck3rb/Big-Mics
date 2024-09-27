@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:big_mics_playtime/widgets/BigMic.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:noise_meter/noise_meter.dart';
@@ -42,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int currentPageIndex = 0;
   Mic mic = Mic();
   late Timer timer;
-
+  final BigMic bigMicGame = BigMic();
 @override
 void initState() {
   super.initState();
@@ -95,14 +96,14 @@ void initState() {
                 Container( 
                   width: 350,
                   height: 350,
-                  child: Placeholder(), // Future implementation of game
+                  child: bigMicGame, // Future implementation of game
                 ),
                 const SizedBox(height: 20), // Functions as a spacer
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Score: ', // Will need to update this to be non const and add in score variable
+                    Text(
+                      'Score: ${BigMic.of(context)?.getCurrentScore() ?? 0}', // Will need to update this to be non const and add in score variable
                       style: TextStyle(fontSize: 15),
                     ),
                     const SizedBox(width: 50),
