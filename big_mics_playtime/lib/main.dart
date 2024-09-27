@@ -99,6 +99,7 @@ void initState() {
                   child: bigMicGame, // Future implementation of game
                 ),
                 const SizedBox(height: 20), // Functions as a spacer
+                /*
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -112,6 +113,7 @@ void initState() {
                       style: TextStyle(fontSize: 15),)
                   ]
                 ),
+                */
                 const SizedBox(height: 20), // Functions as a spacer
               ],
             ),
