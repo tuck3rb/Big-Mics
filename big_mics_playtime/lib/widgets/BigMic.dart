@@ -79,7 +79,7 @@ class BigMicState extends State<BigMic> {
   final double gravity = -9.8;
   final double jumpVelocity = 5.0;
   final double groundLevel = 0;
-  final double minVol = 70;
+  final double minVol = 60;
 
   @override
   void dispose() {
