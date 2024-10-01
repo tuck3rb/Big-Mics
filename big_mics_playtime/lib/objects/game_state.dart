@@ -2,7 +2,8 @@
 
 class Point {
   double x, y;
-  Point(this.x, this.y);
+  bool counted;
+  Point(this.x, this.y) : counted = false;
 }
 
 class GameState {
@@ -16,16 +17,17 @@ class GameState {
   double speed = 2.0;
 
   bool isGameOver = false; 
-  int score = 0;
+  int score = -1;
 
   GameState(int rows, int columns) : obstacles = [] {
     generateInitialObstacles(columns);
+    // print("GameState initialized with ${obstacles.length} obstacles");
   }
 
 
   void generateInitialObstacles(int columns) {
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 1; i++) {
       obstacles.add(Point(columns * (i + 1) * 3, 0));
     }
   }
@@ -34,11 +36,25 @@ class GameState {
     for (var obstacle in obstacles) {
       obstacle.x += speed;
       if (obstacle.x >= 50) {
-        obstacle.x = 0; 
-        score++; 
+        if (!obstacle.counted) {
+          score++;
+          obstacle.counted = true;
+          // print("Obstacle passed. New score: $score");
+        }
+        obstacle.x = 00;
+        obstacle.counted = false;  // Reset the flag for the next round
       }
     }
   }
+
+    void resetGame() {
+      score = -1;
+      isGameOver = false;
+      for (var obstacle in obstacles) {
+        obstacle.counted = false;
+      }
+      // print("Game reset. Score: $score");
+    }
 
   void updateJump(double gravity, double timeStep) {
     if (isJumping) {
@@ -76,6 +92,7 @@ class GameState {
     for (var obstacle in obstacles){
       if (obstacle.x == bigMicX && bigMicY < 2.0){
         isGameOver = true;
+        // print("Collision detected. Game over. Final score: $score");
         break; 
       }
       if (isGameOver) {
@@ -84,6 +101,7 @@ class GameState {
     }
   }
   int getScore() {
+    // print("Current score: $score");
     return score;
   }
 }
