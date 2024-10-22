@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:big_mics_playtime/main.dart';
+import 'package:big_mics_playtime/objects/game_state.dart';
 
 void main() {
   // Test for switching pages and that nav bar works
@@ -36,6 +37,33 @@ void main() {
     expect(find.text('Test microphone.'), findsNothing);
   });
 
-  // Test that when high score and score are incremented, then it increment and it will display
+  late GameState gameState; // for below test
+
+  setUp(() { // for below test
+    gameState = GameState(20, 20);
+  });
+
+  testWidgets('Score increases when BigMic clears an obstacle', 
+  (WidgetTester tester) async {
+    // Initial score should be -1 (game not started)
+    // Score will appear as 0 to the user
+    expect(gameState.getScore(), -1);
+    
+    // Simulate BigMic jumping over obstacle
+    gameState.jump(5.0);
+    
+    // Move obstacle past BigMic position
+    for (int i = 0; i < 30; i++) {
+      gameState.moveObstacles();
+      await tester.pump(const Duration(milliseconds: 200));
+    }
+
+    // Score should have increased to 1
+    expect(gameState.getScore(), 1);
+
+    // Reset game state
+    gameState.resetGame();
+    expect(gameState.getScore(), -1);
+  });
 
 }
