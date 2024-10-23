@@ -11,13 +11,14 @@ import 'package:big_mics_playtime/objects/game_state.dart';
 import 'package:noise_meter/noise_meter.dart';
 
 class BigMic extends StatefulWidget {
-  BigMic({Key? key, this.rows = 20, this.columns = 20, this.cellSize = 10.0})
+  BigMic({Key? key, required this.onScoreChanged, this.rows = 20, this.columns = 20, this.cellSize = 10.0})
       : super(key: key) {
     assert(10 <= rows);
     assert(10 <= columns);
     assert(5.0 <= cellSize);
   }
 
+  final Function(int) onScoreChanged;
   final int rows;
   final int columns;
   final double cellSize;
@@ -107,8 +108,8 @@ void onData(NoiseReading? noiseReading){
 });
 }
 
-int getCurrentScore() {
-  return state!.getScore();
+  int getCurrentScore() {
+    return state!.getScore();
   }
 
 
@@ -124,6 +125,7 @@ int getCurrentScore() {
     _timer = Timer.periodic(const Duration(milliseconds: 200), (_) {
       setState(() {
         _step();
+        widget.onScoreChanged(state?.getScore() ?? -1);
       });
     });
   }

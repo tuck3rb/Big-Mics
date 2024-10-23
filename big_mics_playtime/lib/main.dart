@@ -2,10 +2,9 @@ import 'dart:async';
 import 'package:big_mics_playtime/widgets/BigMic.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:noise_meter/noise_meter.dart';
+// import 'package:noise_meter/noise_meter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:big_mics_playtime/objects/mic.dart';
-
 
 
 void main() {
@@ -43,11 +42,17 @@ class _MyHomePageState extends State<MyHomePage> {
   int currentPageIndex = 0;
   Mic mic = Mic();
   late Timer timer;
-  BigMic bigMicGame = BigMic();
+  late BigMic bigMicGame;
+  int currentScore = -1;
 
 @override
 void initState() {
   super.initState();
+  bigMicGame = BigMic(onScoreChanged: (newScore) {
+    setState(() {
+      currentScore = newScore;
+    });
+  });
   requestPermission();
   }
   
@@ -100,21 +105,19 @@ void initState() {
                   child: bigMicGame, // Future implementation of game
                 ),
                 const SizedBox(height: 20), // Functions as a spacer
-                /*
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Score: ', // Will need to update this to be non const and add in score variable
+                    Text(
+                      'Score: $currentScore',
                       style: TextStyle(fontSize: 15),
                     ),
-                    const SizedBox(width: 50),
-                    const Text(
-                      'High Score: ', // Will need to update this to be non const and add in high_score variable
-                      style: TextStyle(fontSize: 15),)
+                    // const SizedBox(width: 50),
+                    // const Text(
+                    //   'High Score: ', // Will need to update this to be non const and add in high_score variable
+                    //   style: TextStyle(fontSize: 15),)
                   ]
                 ),
-                */
                 const SizedBox(height: 20), // Functions as a spacer
               ],
             ),
