@@ -103,6 +103,7 @@ void onData(NoiseReading? noiseReading){
   setState(() {
     micValue = noiseReading;
     if (micValue!.meanDecibel > minVol && state?.bigMicY == groundLevel) {
+      //Jump to peak (5.0) when the microphone reading is higher than the volume threshold
       state?.jump(5.0);
     }
 });

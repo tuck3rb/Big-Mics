@@ -59,17 +59,21 @@ class GameState {
   void updateJump(double gravity, double timeStep) {
     if (isJumping) {
       if (isGameOver) {
+        // Resets the game if you jump when the game is over
         speed = 2.0;
         score = 0;
         isGameOver = false;
       }
       if(bigMicY <= 5.0 && !peaked){
+        // Jumping upwards
         bigMicY -= timeStep * gravity;
       }
       else {
+        // Tracks if the height has been reached
         peaked = true;
       }
       if(peaked){
+        // Descending logic
         bigMicY += timeStep * gravity;
         if (bigMicY <= 0) { 
           bigMicY = 0;
@@ -82,6 +86,7 @@ class GameState {
 
   void jump(double initialVelocity) {
     if (!isJumping) {
+      // initial jump settings
       isJumping = true;
       bigMicY += 0.1 * initialVelocity;
       peaked = false;
