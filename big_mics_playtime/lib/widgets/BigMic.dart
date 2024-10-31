@@ -5,6 +5,7 @@
 // ignore_for_file: public_member_api_docs
 
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:big_mics_playtime/objects/game_state.dart';
 import 'package:noise_meter/noise_meter.dart';
@@ -144,28 +145,93 @@ class BigMicBoardPainter extends CustomPainter {
     canvas.drawPath(highlight, highlightPaint);
   }
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Draw obstacles
-    final paintObstacle = Paint()
-      ..color = Colors.red
+  void drawSpeaker(Canvas canvas, double x, double y, double size) {
+    // Define colors for a more realistic speaker look
+    final Color speakerBox = Colors.grey[850]!;
+    final Color outerRim = Colors.grey[400]!;
+    final Color innerCone = Colors.grey[600]!;
+    final Color coneHighlight = Colors.grey[500]!;
+
+    // Paints
+    final Paint boxPaint = Paint()
+      ..color = speakerBox
       ..style = PaintingStyle.fill;
 
+    final Paint conePaint = Paint()
+      ..shader = RadialGradient(
+        center: Alignment.center,
+        radius: 0.8,
+        colors: [coneHighlight, innerCone],
+        stops: const [0.5, 1.0],
+      ).createShader(Rect.fromLTWH(x, y, size, size));
+
+    final Paint rimPaint = Paint()
+      ..color = outerRim
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = size * 0.04;
+
+    // Draw speaker box with slight 3D effect
+    Path boxPath = Path();
+    boxPath.addRRect(RRect.fromRectAndRadius(
+      Rect.fromLTWH(x, y, size, size),
+      Radius.circular(size * 0.1),
+    ));
+    canvas.drawPath(boxPath, boxPaint);
+
+    // Add box highlight
+    final Paint boxHighlight = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Colors.grey[800]!, Colors.grey[900]!],
+      ).createShader(Rect.fromLTWH(x, y, size, size));
+    canvas.drawPath(boxPath, boxHighlight);
+
+    // Draw main speaker cone
+    Path conePath = Path();
+    conePath.addOval(
+        Rect.fromLTWH(x + size * 0.1, y + size * 0.1, size * 0.8, size * 0.8));
+    canvas.drawPath(conePath, conePaint);
+
+    // Draw concentric rings for the cone
+    final List<double> ringRadii = [0.3, 0.5, 0.7];
+    for (double radius in ringRadii) {
+      canvas.drawCircle(
+        Offset(x + size * 0.5, y + size * 0.5),
+        size * radius,
+        rimPaint,
+      );
+    }
+
+    // Add central dome
+    final Paint domePaint = Paint()
+      ..shader = RadialGradient(
+        center: Alignment.center,
+        radius: 0.5,
+        colors: [Colors.grey[400]!, Colors.grey[700]!],
+      ).createShader(Rect.fromLTWH(
+          x + size * 0.35, y + size * 0.35, size * 0.3, size * 0.3));
+
+    canvas.drawCircle(
+      Offset(x + size * 0.5, y + size * 0.5),
+      size * 0.15,
+      domePaint,
+    );
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Draw speaker obstacles
     state?.obstacles.forEach((obstacle) {
-      Rect obstacleRect = Rect.fromLTWH(size.width - obstacle.x * cellSize,
-          size.height - cellSize * 2, cellSize, cellSize * 2);
-      canvas.drawRect(obstacleRect, paintObstacle);
+      double obstacleX = size.width - obstacle.x * cellSize;
+      double obstacleY = size.height - cellSize * 2;
+      drawSpeaker(canvas, obstacleX, obstacleY, cellSize * 2);
     });
 
     // Draw microphone sprite
     if (state != null) {
       drawMicrophone(
-          canvas,
-          10, // x position
-          size.height -
-              (state!.bigMicY * cellSize), // y position adjusted for jump
-          size // canvas size
-          );
+          canvas, 10, size.height - (state!.bigMicY * cellSize), size);
     }
   }
 
