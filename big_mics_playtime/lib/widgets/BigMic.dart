@@ -5,7 +5,6 @@
 // ignore_for_file: public_member_api_docs
 
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:big_mics_playtime/objects/game_state.dart';
 import 'package:noise_meter/noise_meter.dart';
