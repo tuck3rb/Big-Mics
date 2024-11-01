@@ -2,13 +2,11 @@ import 'dart:async';
 import 'package:big_mics_playtime/widgets/BigMic.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:noise_meter/noise_meter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:big_mics_playtime/objects/mic.dart';
 
-
 void main() {
-  WidgetsFlutterBinding.ensureInitialized(); // Forces portrait mode
+  WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
@@ -44,35 +42,57 @@ class _MyHomePageState extends State<MyHomePage> {
   late Timer timer;
   late BigMic bigMicGame;
   int currentScore = -1;
+  int highScore = 0;
+  bool isGameActive = false;
+  bool showMenu = true;
 
-@override
-void initState() {
-  super.initState();
-  bigMicGame = BigMic(onScoreChanged: (newScore) {
-    setState(() {
-      currentScore = newScore;
-    });
-  });
-  requestPermission();
+  @override
+  void initState() {
+    super.initState();
+    bigMicGame = BigMic(
+      onScoreChanged: (newScore) {
+        setState(() {
+          currentScore = newScore;
+          if (currentScore > highScore) {
+            highScore = currentScore;
+          }
+        });
+      },
+      onGameOver: () {
+        setState(() {
+          isGameActive = false;
+          showMenu = true;
+        });
+      },
+    );
+    requestPermission();
   }
-  
+
   Future<bool> checkPermission() async {
     return await Permission.microphone.isGranted;
   }
 
   Future<PermissionStatus> requestPermission() async {
-    PermissionStatus permissionStatus = await Permission.microphone.request();
-    return permissionStatus;
+    return await Permission.microphone.request();
   }
 
+  void startNewGame() {
+    setState(() {
+      isGameActive = true;
+      showMenu = false;
+      if (BigMic.of(context) != null) {
+        BigMic.of(context)!.resetGame();
+      }
+    });
+  }
 
-
-  void micStart() async{
+  void micStart() async {
     mic.start();
     timer = Timer.periodic(const Duration(milliseconds: 50), (_) {
       setState(() => mic.recording = true);
     });
   }
+
   void micStop() {
     mic.stop();
     cancelTimer();
@@ -83,45 +103,133 @@ void initState() {
     timer.cancel();
   }
 
+  Widget buildGameMenu() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'Big Mic\'s Playtime',
+            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 40),
+          ElevatedButton(
+            onPressed: startNewGame,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+            ),
+            child: const Text('Start Game', style: TextStyle(fontSize: 20)),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'High Score: $highScore',
+            style: const TextStyle(fontSize: 20),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                currentPageIndex = 1; // Switch to mic test page
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+            ),
+            child:
+                const Text('Test Microphone', style: TextStyle(fontSize: 20)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildGameOver() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'Game Over!',
+            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Score: $currentScore',
+            style: const TextStyle(fontSize: 24),
+          ),
+          Text(
+            'High Score: $highScore',
+            style: const TextStyle(fontSize: 24),
+          ),
+          const SizedBox(height: 40),
+          ElevatedButton(
+            onPressed: startNewGame,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+            ),
+            child: const Text('Play Again', style: TextStyle(fontSize: 20)),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                showMenu = true;
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+            ),
+            child: const Text('Main Menu', style: TextStyle(fontSize: 20)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: <Widget>[
         // Play page
         SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 20),
-                const Text(
-                  'Make noise to jump.',
-                  style: TextStyle(fontSize: 25),
-                ),
-                const SizedBox(height: 20), // Functions as a spacer
-                Container( 
-                  width: 350,
-                  height: 350,
-                  child: bigMicGame, // Future implementation of game
-                ),
-                const SizedBox(height: 20), // Functions as a spacer
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Score: $currentScore',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    // const SizedBox(width: 50),
-                    // const Text(
-                    //   'High Score: ', // Will need to update this to be non const and add in high_score variable
-                    //   style: TextStyle(fontSize: 15),)
-                  ]
-                ),
-                const SizedBox(height: 20), // Functions as a spacer
-              ],
-            ),
-          ),
+          child: showMenu
+              ? buildGameMenu()
+              : isGameActive
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Make noise to jump.',
+                            style: TextStyle(fontSize: 25),
+                          ),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: 350,
+                            height: 350,
+                            child: bigMicGame,
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Score: $currentScore',
+                                style: const TextStyle(fontSize: 15),
+                              ),
+                              const SizedBox(width: 50),
+                              Text(
+                                'High Score: $highScore',
+                                style: const TextStyle(fontSize: 15),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    )
+                  : buildGameOver(),
         ),
         // Mic Test page
         SafeArea(
@@ -131,32 +239,35 @@ void initState() {
               children: [
                 const SizedBox(height: 20),
                 Text(
-                  mic.getLatestReading()!= null
-                    ? mic.getLatestReading()!.meanDecibel
-                      .toString()
-                      .substring(0, 2)
-                    : '0',
+                  mic.getLatestReading() != null
+                      ? mic
+                          .getLatestReading()!
+                          .meanDecibel
+                          .toString()
+                          .substring(0, 2)
+                      : '0',
                   style: const TextStyle(fontSize: 24),
                 ),
-                const SizedBox(height: 30), // Functions as a spacer
+                const SizedBox(height: 30),
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
                     Container(
                       width: 75,
-                      height:300,
-                      decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+                      height: 300,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black)),
                       alignment: Alignment.bottomCenter,
-                      child: Container( 
+                      child: Container(
                         width: 75,
                         height: mic.getLatestReading() != null
-                          ? mic.getLatestReading()!.meanDecibel * 3
-                      
-                          : 20,
+                            ? mic.getLatestReading()!.meanDecibel * 3
+                            : 20,
                         color: mic.getLatestReading() != null
-                          ? (mic.getLatestReading()!.meanDecibel >= 60 ? Colors.green : Colors.red)
-                          : Colors.grey,
-                        // Mic test bar
+                            ? (mic.getLatestReading()!.meanDecibel >= 60
+                                ? Colors.green
+                                : Colors.red)
+                            : Colors.grey,
                       ),
                     ),
                     Positioned(
@@ -178,7 +289,7 @@ void initState() {
                     ),
                   ],
                 ),
-                const SizedBox(height: 30), // Functions as a spacer
+                const SizedBox(height: 30),
                 RawMaterialButton(
                   onPressed: mic.recording ? micStop : micStart,
                   elevation: 2.0,
@@ -194,7 +305,7 @@ void initState() {
             ),
           ),
         ),
-    ][currentPageIndex],
+      ][currentPageIndex],
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
           setState(() {
@@ -218,5 +329,4 @@ void initState() {
       ),
     );
   }
-
 }

@@ -15,8 +15,8 @@ class Mic {
     _latestReading = null;
     maxVol = 0;
     _noiseSubscription = noiseMeter.noise.listen(onData);
-
   }
+
   //Stops the mic and stopls _latestReading and maxVol from updating.
   void stop() {
     _noiseSubscription?.cancel();
@@ -33,6 +33,7 @@ class Mic {
       }
     }
   }
+
   NoiseReading? getLatestReading() {
     return _latestReading;
   }
